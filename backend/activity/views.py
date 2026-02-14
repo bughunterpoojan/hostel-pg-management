@@ -123,11 +123,11 @@ class ComplaintViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.role == 'manager':
-            return self.queryset
+        if hasattr(user, 'role') and user.role == 'manager':
+            return Complaint.objects.all()
         if user.role == 'staff':
-            return self.queryset.filter(assigned_to=user)
-        return self.queryset.filter(student__user=user)
+            return Complaint.objects.filter(assigned_to=user)
+        return Complaint.objects.filter(student__user=user)
 
     def perform_create(self, serializer):
         try:
@@ -143,17 +143,25 @@ class LeaveApplicationViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        if self.request.user.role == 'manager':
-            return self.queryset
+        if hasattr(self.request.user, 'role') and self.request.user.role == 'manager':
+            return LeaveApplication.objects.all()
         return self.queryset.filter(student__user=self.request.user)
 
     def perform_create(self, serializer):
+        print(f"DEBUG: Leave Create - Request Data: {self.request.data}")
+        print(f"DEBUG: Leave Create - Validated Data: {serializer.validated_data}")
         try:
             student_profile = StudentProfile.objects.get(user=self.request.user)
             serializer.save(student=student_profile)
         except StudentProfile.DoesNotExist:
             from rest_framework.exceptions import ValidationError
             raise ValidationError({'detail': 'Student profile not found. Please complete your profile first.'})
+
+    def perform_update(self, serializer):
+        print(f"DEBUG: Leave Update - Request Data: {self.request.data}")
+        print(f"DEBUG: Leave Update - Validated Data: {serializer.validated_data}")
+        instance = serializer.save()
+        print(f"DEBUG: Leave Update - Final Status: {instance.status}")
 
 @decorators.api_view(['GET'])
 @decorators.permission_classes([permissions.IsAuthenticated])

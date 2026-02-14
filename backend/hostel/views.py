@@ -23,6 +23,13 @@ class RoomViewSet(viewsets.ModelViewSet):
     serializer_class = RoomSerializer
     permission_classes = [IsManagerOrReadOnly]
 
+    def perform_create(self, serializer):
+        room = serializer.save()
+        # Automatically create beds based on capacity
+        for i in range(room.capacity):
+            identifier = chr(65 + i) # A, B, C...
+            Bed.objects.create(room=room, identifier=identifier)
+
 class BedViewSet(viewsets.ModelViewSet):
     queryset = Bed.objects.all()
     serializer_class = BedSerializer

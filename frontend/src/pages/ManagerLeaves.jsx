@@ -27,7 +27,8 @@ const ManagerLeaves = () => {
             await api.patch(`activity/leaves/${id}/`, { status });
             fetchLeaves();
         } catch (err) {
-            alert('Action failed');
+            console.error('Action failed:', err.response?.data || err.message);
+            alert(`Action failed: ${JSON.stringify(err.response?.data) || err.message}`);
         }
     };
 

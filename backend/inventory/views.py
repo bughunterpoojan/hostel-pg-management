@@ -8,6 +8,6 @@ class InventoryViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        if self.request.user.role == 'manager':
-            return self.queryset
-        return self.queryset.none() # Only managers can access inventory
+        if hasattr(self.request.user, 'role') and self.request.user.role == 'manager':
+            return Inventory.objects.all()
+        return Inventory.objects.none()

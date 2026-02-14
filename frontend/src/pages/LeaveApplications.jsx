@@ -36,7 +36,16 @@ const LeaveApplications = () => {
             fetchLeaves();
         } catch (err) {
             console.error('Submission error:', err.response?.data || err.message);
-            const errorMsg = err.response?.data ? Object.entries(err.response.data).map(([k, v]) => `${k}: ${v}`).join('\n') : 'Failed to submit application';
+            let errorMsg = 'Failed to submit application';
+            if (err.response?.data) {
+                if (typeof err.response.data === 'object') {
+                    errorMsg = Object.entries(err.response.data).map(([k, v]) => `${k}: ${v}`).join('\n');
+                } else if (typeof err.response.data === 'string') {
+                    // Extract title from HTML if possible
+                    const match = err.response.data.match(/<title>(.*?)<\/title>/);
+                    errorMsg = match ? match[1] : 'Server Error (HTML response)';
+                }
+            }
             alert(`Error: ${errorMsg}`);
         }
     };

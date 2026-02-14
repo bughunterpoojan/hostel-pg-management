@@ -14,7 +14,8 @@ import {
     Title,
     Tooltip,
     Legend,
-    ArcElement
+    ArcElement,
+    Filler
 } from 'chart.js';
 import { Line, Doughnut } from 'react-chartjs-2';
 
@@ -27,7 +28,8 @@ ChartJS.register(
     ArcElement,
     Title,
     Tooltip,
-    Legend
+    Legend,
+    Filler
 );
 
 const StatCard = ({ title, value, icon: Icon, trend, color }) => (

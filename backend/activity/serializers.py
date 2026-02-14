@@ -27,7 +27,7 @@ class ComplaintSerializer(serializers.ModelSerializer):
     class Meta:
         model = Complaint
         fields = ['id', 'student', 'student_name', 'assigned_to', 'assigned_to_name', 'title', 'description', 'status', 'remarks', 'created_at', 'updated_at']
-        read_only_fields = ['student', 'status', 'assigned_to']
+        read_only_fields = ['student']
 
 class LeaveApplicationSerializer(serializers.ModelSerializer):
     student_name = serializers.CharField(source='student.user.username', read_only=True)
@@ -35,7 +35,7 @@ class LeaveApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = LeaveApplication
         fields = ['id', 'student', 'student_name', 'start_date', 'end_date', 'reason', 'status', 'applied_at']
-        read_only_fields = ['student', 'status']
+        read_only_fields = ['student']
 
 class StudentProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
