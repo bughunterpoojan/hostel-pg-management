@@ -15,9 +15,10 @@ class StudentProfileViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        if self.request.user.role == 'manager':
+        user = self.request.user
+        if hasattr(user, 'role') and user.role == 'manager':
             return self.queryset
-        return self.queryset.filter(user=self.request.user)
+        return self.queryset.filter(user=user)
 
 class DocumentViewSet(viewsets.ModelViewSet):
     queryset = Document.objects.all()
@@ -25,9 +26,10 @@ class DocumentViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        if self.request.user.role == 'manager':
+        user = self.request.user
+        if hasattr(user, 'role') and user.role == 'manager':
             return self.queryset
-        return self.queryset.filter(student__user=self.request.user)
+        return self.queryset.filter(student__user=user)
 
     def perform_create(self, serializer):
         student_profile = StudentProfile.objects.get(user=self.request.user)
@@ -47,9 +49,10 @@ class RentViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        if self.request.user.role == 'manager':
+        user = self.request.user
+        if hasattr(user, 'role') and user.role == 'manager':
             return self.queryset
-        return self.queryset.filter(student__user=self.request.user)
+        return self.queryset.filter(student__user=user)
 
     @decorators.action(detail=True, methods=['post'], url_path='create-payment')
     def create_payment(self, request, pk=None):
@@ -113,9 +116,10 @@ class PaymentViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        if self.request.user.role == 'manager':
+        user = self.request.user
+        if hasattr(user, 'role') and user.role == 'manager':
             return self.queryset
-        return self.queryset.filter(rent__student__user=self.request.user)
+        return self.queryset.filter(rent__student__user=user)
 
 class ComplaintViewSet(viewsets.ModelViewSet):
     queryset = Complaint.objects.all()

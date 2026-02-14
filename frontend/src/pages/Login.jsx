@@ -20,7 +20,12 @@ const Login = () => {
         try {
             const user = await login(username, password);
             const from = location.state?.from?.pathname || `/${user.role}`;
-            navigate(from, { replace: true });
+
+            // Safety check: Don't redirect to a route that doesn't match the new user's role
+            const isRoleMismatch = from !== `/${user.role}` && !from.startsWith(`/${user.role}/`);
+            const targetPath = isRoleMismatch ? `/${user.role}` : from;
+
+            navigate(targetPath, { replace: true });
         } catch (err) {
             setError('Invalid username or password');
         } finally {
