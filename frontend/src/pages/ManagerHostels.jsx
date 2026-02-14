@@ -6,6 +6,9 @@ const ManagerHostels = () => {
     const [hostels, setHostels] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedHostel, setSelectedHostel] = useState(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editingRoom, setEditingRoom] = useState(null);
+    const [editForm, setEditForm] = useState({ number: '', room_type: '', rent_amount: '' });
 
     useEffect(() => {
         fetchHostels();
@@ -15,11 +18,36 @@ const ManagerHostels = () => {
         try {
             const res = await api.get('hostel/hostels/');
             setHostels(res.data);
-            if (res.data.length > 0) setSelectedHostel(res.data[0]);
+            if (res.data.length > 0) {
+                const currentSelected = selectedHostel ? res.data.find(h => h.id === selectedHostel.id) : res.data[0];
+                setSelectedHostel(currentSelected || res.data[0]);
+            }
         } catch (err) {
             console.error(err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleEditClick = (room) => {
+        setEditingRoom(room);
+        setEditForm({
+            number: room.number,
+            room_type: room.room_type,
+            rent_amount: room.rent_amount
+        });
+        setIsEditModalOpen(true);
+    };
+
+    const handleEditRoom = async (e) => {
+        e.preventDefault();
+        try {
+            await api.patch(`hostel/rooms/${editingRoom.id}/`, editForm);
+            setIsEditModalOpen(false);
+            fetchHostels();
+        } catch (err) {
+            console.error('Failed to update room:', err);
+            alert('Failed to update room. Please try again.');
         }
     };
 
@@ -114,7 +142,11 @@ const ManagerHostels = () => {
                                                     </div>
                                                 </div>
 
-                                                <button className="btn" style={{ width: '100%', marginTop: '1.25rem', border: '1px solid var(--border)', fontSize: '0.8rem', gap: '0.5rem' }}>
+                                                <button
+                                                    onClick={() => handleEditClick(room)}
+                                                    className="btn"
+                                                    style={{ width: '100%', marginTop: '1.25rem', border: '1px solid var(--border)', fontSize: '0.8rem', gap: '0.5rem' }}
+                                                >
                                                     <Edit3 size={14} /> Edit Room
                                                 </button>
                                             </div>
@@ -135,6 +167,76 @@ const ManagerHostels = () => {
                         </div>
                     )}
                 </div>
+                {/* Edit Room Modal */}
+                {isEditModalOpen && (
+                    <div style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: 'rgba(0,0,0,0.5)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 1000,
+                        backdropFilter: 'blur(4px)'
+                    }}>
+                        <div className="card" style={{ width: '90%', maxWidth: '450px', position: 'relative' }}>
+                            <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>Edit Room {editingRoom?.number}</h2>
+                            <form onSubmit={handleEditRoom} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.5rem' }}>Room Number</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        className="form-input"
+                                        value={editForm.number}
+                                        onChange={(e) => setEditForm({ ...editForm, number: e.target.value })}
+                                        style={{ width: '100%', padding: '0.625rem', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.5rem' }}>Room Type</label>
+                                    <select
+                                        className="form-input"
+                                        value={editForm.room_type}
+                                        onChange={(e) => setEditForm({ ...editForm, room_type: e.target.value })}
+                                        style={{ width: '100%', padding: '0.625rem', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}
+                                    >
+                                        <option value="single">Single</option>
+                                        <option value="double">Double</option>
+                                        <option value="triple">Triple</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.5rem' }}>Rent Amount (₹)</label>
+                                    <input
+                                        type="number"
+                                        required
+                                        className="form-input"
+                                        value={editForm.rent_amount}
+                                        onChange={(e) => setEditForm({ ...editForm, rent_amount: e.target.value })}
+                                        style={{ width: '100%', padding: '0.625rem', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}
+                                    />
+                                </div>
+                                <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsEditModalOpen(false)}
+                                        className="btn"
+                                        style={{ flex: 1, border: '1px solid var(--border)' }}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

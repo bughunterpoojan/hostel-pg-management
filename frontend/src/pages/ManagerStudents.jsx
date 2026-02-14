@@ -27,7 +27,9 @@ const ManagerStudents = () => {
             await api.patch(`activity/profiles/${id}/`, { is_verified: status });
             fetchStudents();
         } catch (err) {
-            alert('Failed to update verification status');
+            console.error('Verification error:', err.response?.data || err.message);
+            const errorMsg = err.response?.data ? Object.entries(err.response.data).map(([k, v]) => `${k}: ${v}`).join('\n') : 'Failed to update verification status';
+            alert(`Error: ${errorMsg}`);
         }
     };
 

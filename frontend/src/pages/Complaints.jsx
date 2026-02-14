@@ -29,7 +29,6 @@ const Complaints = () => {
             await api.post('activity/complaints/', newComplaint);
             setNewComplaint({ title: '', description: '' });
             setShowForm(false);
-            alert('Complaint submitted successfully! 🛠️');
             fetchComplaints();
         } catch (err) {
             console.error('Complaint submission error:', err.response?.data || err.message);

@@ -33,7 +33,6 @@ const LeaveApplications = () => {
             const res = await api.post('activity/leaves/', formData);
             setFormData({ start_date: '', end_date: '', reason: '' });
             setShowForm(false);
-            alert('Leave application submitted successfully! 🚀');
             fetchLeaves();
         } catch (err) {
             console.error('Submission error:', err.response?.data || err.message);
