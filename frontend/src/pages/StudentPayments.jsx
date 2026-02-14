@@ -24,8 +24,23 @@ const StudentPayments = () => {
 
     const { handlePayment } = usePayment(fetchRents);
 
-    const downloadInvoice = (rentId) => {
-        window.open(`http://localhost:8000/api/activity/generate-invoice/${rentId}/`, '_blank');
+    const downloadInvoice = async (rentId) => {
+        try {
+            const response = await api.get(`activity/generate-invoice/${rentId}/`, {
+                responseType: 'blob',
+            });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `invoice_${rentId}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error('Invoice download failed:', err);
+            alert('Failed to download invoice. Please try again.');
+        }
     };
 
     if (loading) return <div>Loading...</div>;
