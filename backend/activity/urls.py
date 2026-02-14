@@ -1,12 +1,12 @@
 from django.urls import path, include
-from rest_framework.routers import SimpleRouter
+from rest_framework.routers import DefaultRouter
 from .views import (
     StudentProfileViewSet, DocumentViewSet, RentViewSet, 
     PaymentViewSet, ComplaintViewSet, LeaveApplicationViewSet,
     generate_invoice_pdf
 )
 
-router = SimpleRouter()
+router = DefaultRouter()
 router.register(r'profiles', StudentProfileViewSet)
 router.register(r'documents', DocumentViewSet)
 router.register(r'rents', RentViewSet)

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../api';
+import usePayment from '../hooks/usePayment';
 import {
     Home, CreditCard, MessageSquare, PlaneTakeoff,
     MapPin, CheckCircle2, Clock, AlertCircle, Phone, Mail
@@ -7,13 +9,49 @@ import {
 
 const StudentDashboard = () => {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
     const [data, setData] = useState({
-        room: { number: '101', bed: 'A', type: 'Double', floor: '1st' },
-        rent: { amount: 5000, status: 'unpaid', dueDate: '20-Feb-2026' },
-        complaints: [
-            { id: 1, title: 'Fan not working', status: 'pending', date: '12 Feb' }
-        ]
+        room: { number: 'N/A', bed: 'N/A', type: 'N/A', floor: 'N/A' },
+        rent: null,
+        complaints: []
     });
+
+    const fetchData = async () => {
+        try {
+            const [profileRes, rentsRes, complaintsRes] = await Promise.all([
+                api.get('activity/profiles/'),
+                api.get('activity/rents/'),
+                api.get('activity/complaints/')
+            ]);
+
+            const profile = profileRes.data[0]; // Assuming one profile per student
+            const unpaidRent = rentsRes.data.find(r => r.status === 'unpaid');
+            const recentComplaints = complaintsRes.data.slice(0, 5);
+
+            setData({
+                room: profile?.current_bed_details ? {
+                    number: profile.current_bed_details.room_number,
+                    bed: profile.current_bed_details.identifier,
+                    type: 'N/A', // Room type not in BedSerializer currently
+                    floor: 'N/A' // Floor info not in BedSerializer currently
+                } : { number: 'N/A', bed: 'N/A', type: 'N/A', floor: 'N/A' },
+                rent: unpaidRent || (rentsRes.data.length > 0 ? rentsRes.data[0] : null),
+                complaints: recentComplaints
+            });
+        } catch (err) {
+            console.error('Failed to fetch dashboard data:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const { handlePayment } = usePayment(fetchData);
+
+    if (loading) return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading Dashboard...</div>;
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -76,26 +114,46 @@ const StudentDashboard = () => {
                         </div>
                         <div>
                             <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Monthly Rent</div>
-                            <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>₹{data.rent.amount.toLocaleString()}</div>
+                            <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>
+                                ₹{data.rent ? (parseFloat(data.rent.amount) + parseFloat(data.rent.late_fee)).toLocaleString() : '0'}
+                            </div>
                         </div>
                     </div>
-                    <div style={{ padding: '1rem', background: '#fff7ed', borderRadius: 'var(--radius)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div>
-                            <div style={{ fontSize: '0.75rem', color: '#9a3412' }}>Due Date</div>
-                            <div style={{ fontWeight: '600', color: '#9a3412' }}>{data.rent.dueDate}</div>
+                    {data.rent && data.rent.status === 'unpaid' ? (
+                        <div style={{ padding: '1rem', background: '#fff7ed', borderRadius: 'var(--radius)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div>
+                                <div style={{ fontSize: '0.75rem', color: '#9a3412' }}>Due Date</div>
+                                <div style={{ fontWeight: '600', color: '#9a3412' }}>{data.rent.due_date}</div>
+                            </div>
+                            <button
+                                onClick={() => handlePayment(data.rent)}
+                                className="btn btn-primary"
+                                style={{ padding: '0.4rem 1rem', fontSize: '0.875rem' }}
+                            >
+                                Pay Now
+                            </button>
                         </div>
-                        <button
-                            onClick={() => navigate('/student/payments')}
-                            className="btn btn-primary"
-                            style={{ padding: '0.4rem 1rem', fontSize: '0.875rem' }}
-                        >
-                            Pay Now
-                        </button>
-                    </div>
+                    ) : (
+                        <div style={{ padding: '1rem', background: '#f0fdf4', borderRadius: 'var(--radius)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div>
+                                <div style={{ fontSize: '0.75rem', color: '#166534' }}>{data.rent ? 'Status' : 'No Data'}</div>
+                                <div style={{ fontWeight: '600', color: '#166534' }}>{data.rent ? 'No Dues' : 'Up to date'}</div>
+                            </div>
+                            <button
+                                onClick={() => navigate('/student/payments')}
+                                className="btn"
+                                style={{ padding: '0.4rem 1rem', fontSize: '0.875rem', background: '#fff', border: '1px solid var(--border)' }}
+                            >
+                                History
+                            </button>
+                        </div>
+                    )}
                     <div style={{ fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <Clock size={16} color="var(--text-muted)" />
                         <span style={{ color: 'var(--text-muted)' }}>Status: </span>
-                        <span className={`badge badge-${data.rent.status === 'paid' ? 'success' : 'warning'}`}>{data.rent.status}</span>
+                        <span className={`badge badge-${data.rent?.status === 'paid' ? 'success' : 'warning'}`}>
+                            {data.rent?.status || 'No Dues'}
+                        </span>
                     </div>
                 </div>
             </div>
