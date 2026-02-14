@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../api';
+import usePayment from '../hooks/usePayment';
 import { CreditCard, Download, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 
 const StudentPayments = () => {
@@ -21,48 +22,7 @@ const StudentPayments = () => {
         }
     };
 
-    const handlePayment = async (rent) => {
-        try {
-            // 1. Create Order on Backend
-            const orderRes = await api.post(`activity/rents/${rent.id}/create-payment/`);
-            const { id: order_id, amount, currency } = orderRes.data;
-
-            // 2. Open Razorpay Checkout
-            const options = {
-                key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Fetched from Vite env variables
-                amount: amount,
-                currency: currency,
-                name: "HostelHub",
-                description: `Rent for ${rent.month}`,
-                order_id: order_id,
-                handler: async (response) => {
-                    // 3. Verify Payment on Backend
-                    try {
-                        await api.post(`activity/rents/${rent.id}/verify-payment/`, {
-                            razorpay_payment_id: response.razorpay_payment_id,
-                            razorpay_order_id: response.razorpay_order_id,
-                            razorpay_signature: response.razorpay_signature,
-                        });
-                        alert('Payment Successful!');
-                        fetchRents();
-                    } catch (err) {
-                        alert('Verification failed');
-                    }
-                },
-                prefill: {
-                    name: "Student Name",
-                    email: "student@example.com",
-                },
-                theme: { color: "#2563eb" },
-            };
-
-            const rzp = new window.Razorpay(options);
-            rzp.open();
-        } catch (err) {
-            console.error(err);
-            alert('Failed to initiate payment');
-        }
-    };
+    const { handlePayment } = usePayment(fetchRents);
 
     const downloadInvoice = (rentId) => {
         window.open(`http://localhost:8000/api/activity/generate-invoice/${rentId}/`, '_blank');

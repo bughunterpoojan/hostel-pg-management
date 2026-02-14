@@ -104,7 +104,8 @@ class RentViewSet(viewsets.ModelViewSet):
 
             return Response({'status': 'payment verification successful'})
         except Exception as e:
-            return Response({'error': 'Payment verification failed'}, status=status.HTTP_400_BAD_REQUEST)
+            print(f"PAYMENT VERIFICATION ERROR: {str(e)}")
+            return Response({'error': f'Payment verification failed: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
 
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
