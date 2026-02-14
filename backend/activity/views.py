@@ -130,8 +130,12 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         return self.queryset.filter(student__user=user)
 
     def perform_create(self, serializer):
-        student_profile = StudentProfile.objects.get(user=self.request.user)
-        serializer.save(student=student_profile)
+        try:
+            student_profile = StudentProfile.objects.get(user=self.request.user)
+            serializer.save(student=student_profile)
+        except StudentProfile.DoesNotExist:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError({'detail': 'Student profile not found. Please complete your profile first.'})
 
 class LeaveApplicationViewSet(viewsets.ModelViewSet):
     queryset = LeaveApplication.objects.all()
@@ -144,8 +148,12 @@ class LeaveApplicationViewSet(viewsets.ModelViewSet):
         return self.queryset.filter(student__user=self.request.user)
 
     def perform_create(self, serializer):
-        student_profile = StudentProfile.objects.get(user=self.request.user)
-        serializer.save(student=student_profile)
+        try:
+            student_profile = StudentProfile.objects.get(user=self.request.user)
+            serializer.save(student=student_profile)
+        except StudentProfile.DoesNotExist:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError({'detail': 'Student profile not found. Please complete your profile first.'})
 
 @decorators.api_view(['GET'])
 @decorators.permission_classes([permissions.IsAuthenticated])

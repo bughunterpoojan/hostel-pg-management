@@ -29,9 +29,12 @@ const Complaints = () => {
             await api.post('activity/complaints/', newComplaint);
             setNewComplaint({ title: '', description: '' });
             setShowForm(false);
+            alert('Complaint submitted successfully! 🛠️');
             fetchComplaints();
         } catch (err) {
-            alert('Failed to submit complaint');
+            console.error('Complaint submission error:', err.response?.data || err.message);
+            const errorMsg = err.response?.data ? Object.entries(err.response.data).map(([k, v]) => `${k}: ${v}`).join('\n') : 'Failed to submit complaint';
+            alert(`Error: ${errorMsg}`);
         }
     };
 

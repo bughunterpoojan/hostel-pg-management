@@ -30,12 +30,15 @@ const LeaveApplications = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await api.post('activity/leaves/', formData);
+            const res = await api.post('activity/leaves/', formData);
             setFormData({ start_date: '', end_date: '', reason: '' });
             setShowForm(false);
+            alert('Leave application submitted successfully! 🚀');
             fetchLeaves();
         } catch (err) {
-            alert('Failed to submit application');
+            console.error('Submission error:', err.response?.data || err.message);
+            const errorMsg = err.response?.data ? Object.entries(err.response.data).map(([k, v]) => `${k}: ${v}`).join('\n') : 'Failed to submit application';
+            alert(`Error: ${errorMsg}`);
         }
     };
 

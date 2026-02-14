@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Home, CreditCard, MessageSquare, PlaneTakeoff,
     MapPin, CheckCircle2, Clock, AlertCircle, Phone, Mail
 } from 'lucide-react';
 
 const StudentDashboard = () => {
+    const navigate = useNavigate();
     const [data, setData] = useState({
         room: { number: '101', bed: 'A', type: 'Double', floor: '1st' },
         rent: { amount: 5000, status: 'unpaid', dueDate: '20-Feb-2026' },
@@ -21,10 +23,18 @@ const StudentDashboard = () => {
                     <p style={{ color: 'var(--text-muted)' }}>Everything you need for your stay.</p>
                 </div>
                 <div style={{ display: 'flex', gap: '0.75rem' }}>
-                    <button className="btn btn-primary" style={{ gap: '0.5rem' }}>
+                    <button
+                        onClick={() => navigate('/student/complaints')}
+                        className="btn btn-primary"
+                        style={{ gap: '0.5rem' }}
+                    >
                         <MessageSquare size={18} /> New Complaint
                     </button>
-                    <button className="btn" style={{ background: '#fff', border: '1px solid var(--border)', gap: '0.5rem' }}>
+                    <button
+                        onClick={() => navigate('/student/leaves')}
+                        className="btn"
+                        style={{ background: '#fff', border: '1px solid var(--border)', gap: '0.5rem' }}
+                    >
                         <PlaneTakeoff size={18} /> Apply Leave
                     </button>
                 </div>
@@ -74,7 +84,13 @@ const StudentDashboard = () => {
                             <div style={{ fontSize: '0.75rem', color: '#9a3412' }}>Due Date</div>
                             <div style={{ fontWeight: '600', color: '#9a3412' }}>{data.rent.dueDate}</div>
                         </div>
-                        <button className="btn btn-primary" style={{ padding: '0.4rem 1rem', fontSize: '0.875rem' }}>Pay Now</button>
+                        <button
+                            onClick={() => navigate('/student/payments')}
+                            className="btn btn-primary"
+                            style={{ padding: '0.4rem 1rem', fontSize: '0.875rem' }}
+                        >
+                            Pay Now
+                        </button>
                     </div>
                     <div style={{ fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <Clock size={16} color="var(--text-muted)" />
