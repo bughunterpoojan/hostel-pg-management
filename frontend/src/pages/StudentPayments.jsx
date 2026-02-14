@@ -29,7 +29,7 @@ const StudentPayments = () => {
 
             // 2. Open Razorpay Checkout
             const options = {
-                key: "rzp_test_YOUR_KEY", // Should be fetched from env or settings
+                key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Fetched from Vite env variables
                 amount: amount,
                 currency: currency,
                 name: "HostelHub",

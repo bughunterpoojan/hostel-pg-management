@@ -11,6 +11,16 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import django.urls
+
+# Monkeypatch to fix DRF + Django 6.0 register_converter conflict
+_original_register_converter = django.urls.register_converter
+def _idempotent_register_converter(converter, name):
+    try:
+        _original_register_converter(converter, name)
+    except ValueError:
+        pass
+django.urls.register_converter = _idempotent_register_converter
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -142,4 +152,11 @@ REST_FRAMEWORK = {
     ],
 }
 
+
+import os
+
 CORS_ALLOW_ALL_ORIGINS = True  # For development
+
+# Razorpay Settings
+RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', 'test')
+RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', 'test')
