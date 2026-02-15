@@ -27,7 +27,18 @@ class ComplaintSerializer(serializers.ModelSerializer):
     class Meta:
         model = Complaint
         fields = ['id', 'student', 'student_name', 'assigned_to', 'assigned_to_name', 'title', 'description', 'status', 'remarks', 'created_at', 'updated_at']
-        read_only_fields = ['student']
+        read_only_fields = ['student', 'assigned_to']
+
+    def validate(self, data):
+        request = self.context.get('request')
+        if request and request.method in ['PATCH', 'PUT']:
+            user = request.user
+            if user.role == 'student':
+                # Students cannot change status or remarks
+                if 'status' in data or 'remarks' in data:
+                    from rest_framework import serializers
+                    raise serializers.ValidationError("Students cannot update complaint status or remarks.")
+        return data
 
 class LeaveApplicationSerializer(serializers.ModelSerializer):
     student_name = serializers.CharField(source='student.user.username', read_only=True)

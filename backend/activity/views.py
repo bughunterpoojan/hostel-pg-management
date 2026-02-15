@@ -1,3 +1,4 @@
+
 from rest_framework import viewsets, permissions, status, decorators
 from rest_framework.response import Response
 from .models import StudentProfile, Document, Rent, Payment, Complaint, LeaveApplication
@@ -8,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from reportlab.pdfgen import canvas
 from io import BytesIO
+from django.db.models import Q
 
 class StudentProfileViewSet(viewsets.ModelViewSet):
     queryset = StudentProfile.objects.all()
@@ -147,7 +149,7 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         if hasattr(user, 'role') and user.role == 'manager':
             return Complaint.objects.all()
         if user.role == 'staff':
-            return Complaint.objects.filter(assigned_to=user)
+            return Complaint.objects.filter(Q(assigned_to=user) | Q(assigned_to__isnull=True))
         return Complaint.objects.filter(student__user=user)
 
     def perform_create(self, serializer):

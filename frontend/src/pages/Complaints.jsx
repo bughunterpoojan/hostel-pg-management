@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import api from '../api';
 import { MessageSquare, Plus, AlertCircle, Clock, CheckCircle2, User, Send } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const Complaints = () => {
+    const { user } = useAuth();
     const [complaints, setComplaints] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -32,7 +34,16 @@ const Complaints = () => {
             fetchComplaints();
         } catch (err) {
             console.error('Complaint submission error:', err.response?.data || err.message);
-            const errorMsg = err.response?.data ? Object.entries(err.response.data).map(([k, v]) => `${k}: ${v}`).join('\n') : 'Failed to submit complaint';
+            let errorMsg = 'Failed to submit complaint';
+            if (err.response?.data) {
+                if (typeof err.response.data === 'object') {
+                    errorMsg = Object.entries(err.response.data)
+                        .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
+                        .join('\n');
+                } else {
+                    errorMsg = err.response.data;
+                }
+            }
             alert(`Error: ${errorMsg}`);
         }
     };
@@ -46,13 +57,15 @@ const Complaints = () => {
                     <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Complaint Management</h1>
                     <p style={{ color: 'var(--text-muted)' }}>Report and track maintenance issues.</p>
                 </div>
-                <button
-                    onClick={() => setShowForm(!showForm)}
-                    className="btn btn-primary"
-                    style={{ gap: '0.5rem' }}
-                >
-                    {showForm ? 'Cancel' : <><Plus size={18} /> New Complaint</>}
-                </button>
+                {user?.role !== 'manager' && (
+                    <button
+                        onClick={() => setShowForm(!showForm)}
+                        className="btn btn-primary"
+                        style={{ gap: '0.5rem' }}
+                    >
+                        {showForm ? 'Cancel' : <><Plus size={18} /> New Complaint</>}
+                    </button>
+                )}
             </div>
 
             {showForm && (
