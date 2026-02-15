@@ -1,13 +1,16 @@
+import { useState } from 'react';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 
 const DashboardLayout = ({ children }) => {
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
     return (
         <div className="dashboard-layout">
-            <Sidebar />
-            <div className="main-content" style={{ display: 'flex', flexDirection: 'column' }}>
-                <Navbar />
-                <main style={{ padding: '2rem', flex: 1, overflowY: 'auto' }}>
+            <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+            <div className="main-content">
+                <Navbar onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+                <main>
                     {children}
                 </main>
             </div>

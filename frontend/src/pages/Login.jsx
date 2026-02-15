@@ -20,11 +20,8 @@ const Login = () => {
         try {
             const user = await login(username, password);
             const from = location.state?.from?.pathname || `/${user.role}`;
-
-            // Safety check: Don't redirect to a route that doesn't match the new user's role
             const isRoleMismatch = from !== `/${user.role}` && !from.startsWith(`/${user.role}/`);
             const targetPath = isRoleMismatch ? `/${user.role}` : from;
-
             navigate(targetPath, { replace: true });
         } catch (err) {
             setError('Invalid username or password');
@@ -39,91 +36,131 @@ const Login = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'var(--bg-main)'
+            background: 'radial-gradient(circle at top right, #ecfdf5 0%, #f8fafc 100%)',
+            position: 'relative',
+            overflow: 'hidden'
         }}>
-            <div className="card" style={{ width: '400px', padding: '2.5rem' }}>
-                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            {/* Decorative elements */}
+            <div style={{
+                position: 'absolute',
+                top: '-10%',
+                right: '-10%',
+                width: '40%',
+                height: '40%',
+                background: 'var(--primary-glow)',
+                borderRadius: '50%',
+                filter: 'blur(80px)',
+                zIndex: 0
+            }}></div>
+
+            <div className="card" style={{
+                width: '100%',
+                maxWidth: '440px',
+                padding: '3rem',
+                zIndex: 1,
+                boxShadow: 'var(--shadow-lg)',
+                border: '1px solid #fff'
+            }}>
+                <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
                     <div style={{
-                        width: '48px',
-                        height: '48px',
-                        background: '#eff6ff',
-                        color: 'var(--primary)',
-                        borderRadius: 'var(--radius)',
+                        width: '64px',
+                        height: '64px',
+                        background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))',
+                        color: '#fff',
+                        borderRadius: '16px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        margin: '0 auto 1rem'
+                        margin: '0 auto 1.5rem',
+                        boxShadow: '0 8px 16px var(--primary-glow)'
                     }}>
                         <Building2 size={32} />
                     </div>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Welcome Back</h1>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Login to access your hostel dashboard</p>
+                    <h1 style={{ fontSize: '1.875rem', fontWeight: '800', letterSpacing: '-0.025em', color: 'var(--text-main)' }}>Welcome Back</h1>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9375rem', marginTop: '0.5rem' }}>Access your personalized hostel dashboard</p>
                 </div>
 
                 {error && (
                     <div style={{
-                        background: '#fee2e2',
+                        background: '#fef2f2',
                         color: 'var(--danger)',
-                        padding: '0.75rem',
+                        padding: '1rem',
                         borderRadius: 'var(--radius)',
                         fontSize: '0.875rem',
-                        marginBottom: '1rem',
-                        textAlign: 'center'
+                        marginBottom: '1.5rem',
+                        textAlign: 'center',
+                        border: '1px solid #fecaca',
+                        fontWeight: '500'
                     }}>
                         {error}
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit}>
-                    <div style={{ marginBottom: '1.25rem' }}>
-                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.5rem' }}>Username</label>
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--text-main)' }}>Username</label>
                         <div style={{ position: 'relative' }}>
+                            <Mail size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-light)' }} />
                             <input
                                 type="text"
                                 required
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
+                                placeholder="Enter your username"
                                 style={{
                                     width: '100%',
-                                    padding: '0.625rem 1rem',
+                                    padding: '0.75rem 1rem 0.75rem 2.5rem',
                                     borderRadius: 'var(--radius)',
                                     border: '1px solid var(--border)',
-                                    outline: 'none'
+                                    outline: 'none',
+                                    fontSize: '0.9375rem',
+                                    transition: 'var(--transition)'
                                 }}
+                                onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+                                onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
                             />
                         </div>
                     </div>
 
-                    <div style={{ marginBottom: '1.5rem' }}>
-                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.5rem' }}>Password</label>
-                        <input
-                            type="password"
-                            required
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            style={{
-                                width: '100%',
-                                padding: '0.625rem 1rem',
-                                borderRadius: 'var(--radius)',
-                                border: '1px solid var(--border)',
-                                outline: 'none'
-                            }}
-                        />
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--text-main)' }}>Password</label>
+                        <div style={{ position: 'relative' }}>
+                            <Lock size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-light)' }} />
+                            <input
+                                type="password"
+                                required
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="••••••••"
+                                style={{
+                                    width: '100%',
+                                    padding: '0.75rem 1rem 2.5rem',
+                                    paddingLeft: '2.5rem',
+                                    borderRadius: 'var(--radius)',
+                                    border: '1px solid var(--border)',
+                                    outline: 'none',
+                                    fontSize: '0.9375rem',
+                                    transition: 'var(--transition)'
+                                }}
+                                onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+                                onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+                            />
+                        </div>
                     </div>
 
                     <button
                         type="submit"
                         disabled={loading}
                         className="btn btn-primary"
-                        style={{ width: '100%', padding: '0.75rem' }}
+                        style={{ width: '100%', padding: '0.875rem', marginTop: '0.5rem', fontSize: '1rem' }}
                     >
-                        {loading ? <Loader2 className="animate-spin" size={20} /> : 'Sign In'}
+                        {loading ? <Loader2 className="animate-spin" size={20} /> : 'Sign In to Dashboard'}
                     </button>
                 </form>
 
-                <p style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-                    Don't have an account? <Link to="/register" style={{ color: 'var(--primary)', fontWeight: '600' }}>Register here</Link>
-                </p>
+                <div style={{ marginTop: '2rem', textAlign: 'center', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+                    Don't have an account? <Link to="/register" style={{ color: 'var(--primary)', fontWeight: '700', textDecoration: 'underline', textUnderlineOffset: '4px' }}>Create an account</Link>
+                </div>
             </div>
         </div>
     );

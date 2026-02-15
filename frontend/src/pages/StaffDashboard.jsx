@@ -46,106 +46,182 @@ const StaffDashboard = () => {
         }
     };
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return (
+        <div style={{ padding: '4rem', textAlign: 'center' }}>
+            <div className="animate-spin" style={{ display: 'inline-block', width: '30px', height: '30px', border: '3px solid var(--primary-glow)', borderTopColor: 'var(--primary)', borderRadius: '50%' }}></div>
+            <p style={{ marginTop: '1rem', color: 'var(--text-muted)' }}>Updating your task list...</p>
+        </div>
+    );
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            <div>
-                <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Maintenance Staff Dashboard</h1>
-                <p style={{ color: 'var(--text-muted)' }}>Manage and resolve assigned complaints.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
+                <div>
+                    <h1 style={{ fontSize: '1.875rem', fontWeight: '800', letterSpacing: '-0.025em', color: 'var(--text-main)' }}>Maintenance Console</h1>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '1rem' }}>Manage and track your assigned technical tasks.</p>
+                </div>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                    <div style={{ padding: '0.625rem 1rem', borderRadius: '12px', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '0.625rem', background: '#fff' }}>
+                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', animation: 'pulse 2s infinite' }}></div>
+                        <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-main)' }}>SYSTEM ONLINE</span>
+                    </div>
+                </div>
             </div>
 
-            <div className="card">
-                <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1.5rem' }}>Assigned Complaints</h2>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div className="card" style={{ padding: '2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem' }}>
+                    <div style={{ padding: '0.625rem', borderRadius: '12px', background: 'var(--primary-glow)', color: 'var(--primary)' }}>
+                        <Clock size={24} />
+                    </div>
+                    <div>
+                        <h2 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.025em' }}>Assigned Workload</h2>
+                        <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{complaints.filter(c => c.status !== 'resolved').length} issues require attention</p>
+                    </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     {complaints.length > 0 ? complaints.map((c) => (
-                        <div key={c.id} className="card" style={{ padding: '1.5rem', border: '1px solid var(--border)', background: c.status === 'resolved' ? '#f8fafc' : '#fff' }}>
+                        <div key={c.id} className="card" style={{
+                            padding: '1.5rem 2rem',
+                            border: '1px solid var(--border)',
+                            background: c.status === 'resolved' ? 'var(--bg-main)' : '#fff',
+                            transition: 'var(--transition)'
+                        }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                <div style={{ display: 'flex', gap: '1.25rem' }}>
+                                <div style={{ display: 'flex', gap: '1.5rem', flex: 1 }}>
                                     <div style={{
-                                        width: '40px',
-                                        height: '40px',
-                                        borderRadius: 'var(--radius)',
-                                        background: '#f1f5f9',
+                                        width: '48px',
+                                        height: '48px',
+                                        borderRadius: '14px',
+                                        background: 'var(--bg-main)',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        color: 'var(--primary)'
+                                        color: 'var(--primary)',
+                                        border: '1px solid var(--border-light)'
                                     }}>
-                                        <MessageSquare size={20} />
+                                        <MessageSquare size={22} />
                                     </div>
-                                    <div>
-                                        <h3 style={{ fontSize: '1rem', fontWeight: '600' }}>{c.title}</h3>
-                                        <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-                                            Student: {c.student_name} • Room: {c.room_number || 'N/A'}
-                                        </p>
-                                        <p style={{ fontSize: '0.875rem', marginTop: '0.5rem' }}>{c.description}</p>
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                            <h3 style={{ fontSize: '1.125rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.01em' }}>{c.title}</h3>
+                                            <span style={{ fontSize: '0.75rem', color: 'var(--text-light)', fontWeight: '700' }}>#{c.id.toString().padStart(4, '0')}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '1rem', marginTop: '0.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', fontWeight: '600' }}>
+                                            <span>Student: {c.student_name}</span>
+                                            <span>•</span>
+                                            <span>Room: {c.room_number || 'N/A'}</span>
+                                        </div>
+                                        <p style={{ fontSize: '0.9375rem', marginTop: '1rem', color: 'var(--text-main)', lineHeight: '1.6' }}>{c.description}</p>
+
                                         {c.remarks && (
-                                            <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: '#eff6ff', borderRadius: '4px', fontSize: '0.875rem' }}>
-                                                <span style={{ fontWeight: '600' }}>Remarks:</span> {c.remarks}
+                                            <div style={{
+                                                marginTop: '1.25rem',
+                                                padding: '1rem 1.25rem',
+                                                background: 'var(--bg-main)',
+                                                borderRadius: '12px',
+                                                fontSize: '0.875rem',
+                                                border: '1px solid var(--border)',
+                                                display: 'flex',
+                                                gap: '0.75rem',
+                                                color: 'var(--text-muted)'
+                                            }}>
+                                                <Edit size={16} />
+                                                <span><span style={{ fontWeight: '800', color: 'var(--text-main)' }}>Latest Update:</span> {c.remarks}</span>
                                             </div>
                                         )}
                                     </div>
                                 </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'flex-end', minWidth: '140px' }}>
                                     <div className={`badge ${getStatusColor(c.status)}`}>
                                         {c.status?.replace('_', ' ') || 'Pending'}
                                     </div>
-                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{new Date(c.created_at).toLocaleDateString()}</span>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.75rem', color: 'var(--text-light)', fontWeight: '600' }}>
+                                        <Clock size={12} />
+                                        <span>{new Date(c.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+                                    </div>
                                 </div>
                             </div>
 
                             {editingId === c.id ? (
-                                <div style={{ marginTop: '1.5rem', borderTop: '1px solid var(--border)', paddingTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem' }}>
+                                <div style={{
+                                    marginTop: '2rem',
+                                    paddingTop: '2rem',
+                                    borderTop: '1.5px dashed var(--border)',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '1.5rem'
+                                }}>
+                                    <div className="actions-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1.5rem' }}>
                                         <div>
-                                            <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: '500', marginBottom: '0.4rem' }}>Status</label>
+                                            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.625rem' }}>Progress</label>
                                             <select
                                                 value={editForm.status}
                                                 onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
-                                                className="form-input"
-                                                style={{ width: '100%', padding: '0.5rem', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}
+                                                style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', border: '1.5px solid var(--border)', background: '#fff', outline: 'none', fontWeight: '600', color: 'var(--text-main)', fontSize: '0.875rem' }}
                                             >
-                                                <option value="pending">Pending</option>
-                                                <option value="in_progress">In Progress</option>
-                                                <option value="resolved">Resolved</option>
+                                                <option value="pending">🟡 Pending</option>
+                                                <option value="in_progress">🔵 In Progress</option>
+                                                <option value="resolved">🟢 Resolved</option>
                                             </select>
                                         </div>
                                         <div>
-                                            <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: '500', marginBottom: '0.4rem' }}>Work Description / Remarks</label>
+                                            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.625rem' }}>Remarks</label>
                                             <input
                                                 type="text"
                                                 value={editForm.remarks}
                                                 onChange={(e) => setEditForm({ ...editForm, remarks: e.target.value })}
-                                                className="form-input"
-                                                placeholder="e.g., Replaced the broken part"
-                                                style={{ width: '100%', padding: '0.5rem', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}
+                                                placeholder="Action taken..."
+                                                style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', border: '1.5px solid var(--border)', background: '#fff', outline: 'none', fontSize: '0.875rem' }}
+                                                onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+                                                onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
                                             />
                                         </div>
                                     </div>
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                        <button onClick={() => handleUpdate(c.id)} className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.8125rem', gap: '0.4rem' }}>
-                                            <Save size={16} /> Save Changes
+                                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                                        <button onClick={() => setEditingId(null)} className="btn" style={{ padding: '0.75rem 1.5rem', background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-muted)' }}>
+                                            <XCircle size={18} /> Discard Changes
                                         </button>
-                                        <button onClick={() => setEditingId(null)} className="btn" style={{ padding: '0.5rem 1rem', fontSize: '0.8125rem', border: '1px solid var(--border)', gap: '0.4rem' }}>
-                                            <XCircle size={16} /> Cancel
+                                        <button onClick={() => handleUpdate(c.id)} className="btn btn-primary" style={{ padding: '0.75rem 2rem' }}>
+                                            <Save size={18} /> Update & Sync Task
                                         </button>
                                     </div>
                                 </div>
                             ) : (
                                 c.status !== 'resolved' && (
-                                    <div style={{ marginTop: '1.25rem', display: 'flex', gap: '0.75rem' }}>
-                                        <button onClick={() => startEdit(c)} className="btn btn-primary" style={{ fontSize: '0.8125rem', gap: '0.4rem' }}>
-                                            <Edit size={14} /> Update Task
+                                    <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+                                        <button onClick={() => startEdit(c)} className="btn" style={{
+                                            padding: '0.625rem 1.25rem',
+                                            fontSize: '0.875rem',
+                                            gap: '0.5rem',
+                                            background: '#fff',
+                                            border: '1px solid var(--border)',
+                                            color: 'var(--primary)',
+                                            fontWeight: '700'
+                                        }}>
+                                            <Edit size={16} /> Edit Progress Note
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setEditForm({ status: 'resolved', remarks: 'Work completed as requested.' });
+                                                handleUpdate(c.id);
+                                            }}
+                                            className="btn btn-primary"
+                                            style={{ fontSize: '0.875rem', gap: '0.5rem', padding: '0.625rem 1.25rem' }}
+                                        >
+                                            <CheckCircle2 size={16} /> Mark as Resolved
                                         </button>
                                     </div>
                                 )
                             )}
                         </div>
                     )) : (
-                        <div className="card" style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
-                            <MessageSquare size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
-                            <p>No complaints assigned yet.</p>
+                        <div className="card" style={{ textAlign: 'center', padding: '6rem', background: 'transparent', border: '2px dashed var(--border)' }}>
+                            <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: 'var(--bg-main)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', color: 'var(--text-light)' }}>
+                                <MessageSquare size={36} />
+                            </div>
+                            <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-light)' }}>No active complaints assigned</h3>
+                            <p style={{ color: 'var(--text-light)', marginTop: '0.5rem' }}>All issues assigned to you will be listed here for management.</p>
                         </div>
                     )}
                 </div>
