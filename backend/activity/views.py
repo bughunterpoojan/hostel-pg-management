@@ -20,6 +20,22 @@ class StudentProfileViewSet(viewsets.ModelViewSet):
             return self.queryset
         return self.queryset.filter(user=user)
 
+    @decorators.action(detail=True, methods=['post'])
+    def verify(self, request, pk=None):
+        profile = self.get_object()
+        profile.is_verified = True
+        profile.save()
+        send_notification(profile.user, "Account Verified", "Your profile has been verified by the manager.")
+        return Response({'status': 'verified'})
+
+    @decorators.action(detail=True, methods=['post'])
+    def unverify(self, request, pk=None):
+        profile = self.get_object()
+        profile.is_verified = False
+        profile.save()
+        send_notification(profile.user, "Account Unverified", "Your profile verification has been revoked. Please contact the manager.")
+        return Response({'status': 'unverified'})
+
 class DocumentViewSet(viewsets.ModelViewSet):
     queryset = Document.objects.all()
     serializer_class = DocumentSerializer
