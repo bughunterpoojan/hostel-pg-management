@@ -3,10 +3,13 @@ from .models import Hostel, Floor, Room, Bed
 
 class BedSerializer(serializers.ModelSerializer):
     room_number = serializers.CharField(source='room.number', read_only=True)
+    room_type = serializers.CharField(source='room.get_room_type_display', read_only=True)
+    floor_number = serializers.IntegerField(source='room.floor.number', read_only=True)
+    hostel_name = serializers.CharField(source='room.floor.hostel.name', read_only=True)
 
     class Meta:
         model = Bed
-        fields = ['id', 'room', 'room_number', 'identifier', 'is_occupied']
+        fields = ['id', 'room', 'room_number', 'room_type', 'floor_number', 'hostel_name', 'identifier', 'is_occupied']
 
 class RoomSerializer(serializers.ModelSerializer):
     beds = BedSerializer(many=True, read_only=True)

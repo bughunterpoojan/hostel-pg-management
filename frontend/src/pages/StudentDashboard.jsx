@@ -32,9 +32,10 @@ const StudentDashboard = () => {
                 room: profile?.current_bed_details ? {
                     number: profile.current_bed_details.room_number,
                     bed: profile.current_bed_details.identifier,
-                    type: 'N/A', // Room type not in BedSerializer currently
-                    floor: 'N/A' // Floor info not in BedSerializer currently
-                } : { number: 'N/A', bed: 'N/A', type: 'N/A', floor: 'N/A' },
+                    type: profile.current_bed_details.room_type,
+                    floor: `Floor ${profile.current_bed_details.floor_number}`,
+                    hostel: profile.current_bed_details.hostel_name
+                } : { number: 'N/A', bed: 'N/A', type: 'N/A', floor: 'N/A', hostel: 'N/A' },
                 rent: unpaidRent || (rentsRes.data.length > 0 ? rentsRes.data[0] : null),
                 complaints: recentComplaints
             });
@@ -102,7 +103,7 @@ const StudentDashboard = () => {
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
                         <MapPin size={16} />
-                        <span>Boys Hostel, Block A</span>
+                        <span>{data.room.hostel || 'Hostel Location'}</span>
                     </div>
                 </div>
 
@@ -174,7 +175,9 @@ const StudentDashboard = () => {
                             {data.complaints.map(c => (
                                 <tr key={c.id} style={{ borderBottom: '1px solid var(--border)' }}>
                                     <td style={{ padding: '1rem 0', fontWeight: '500' }}>{c.title}</td>
-                                    <td style={{ padding: '1rem 0', fontSize: '0.875rem' }}>{c.date}</td>
+                                    <td style={{ padding: '1rem 0', fontSize: '0.875rem' }}>
+                                        {new Date(c.created_at).toLocaleDateString()}
+                                    </td>
                                     <td style={{ padding: '1rem 0' }}>
                                         <span className={`badge badge-${c.status === 'resolved' ? 'success' : 'warning'}`}>{c.status}</span>
                                     </td>
